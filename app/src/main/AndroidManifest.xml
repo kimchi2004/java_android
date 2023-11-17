@@ -13,7 +13,7 @@
         android:theme="@style/Theme.Javademo"
         tools:targetApi="31">
         <activity
-            android:name=".LoginActivity"
+            android:name=".authentication.login.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,27 +22,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RegisterActivity"
+            android:name=".authentication.register.RegisterActivity"
             android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".ForgotPasswordActivity"
+            android:name=".authentication.resetpassword.ForgotPasswordActivity"
             android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".testlogingg"
+            android:name=".authentication.login.testloginwithgg"
             android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CheckEmailActivity"
+        <activity android:name=".authentication.resetpassword.CheckEmailActivity"
             android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER"/>

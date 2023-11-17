@@ -7,7 +7,7 @@
     android:background="@color/purple"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".CheckEmailActivity">
+    tools:context=".authentication.resetpassword.CheckEmailActivity">
 
 
     <androidx.cardview.widget.CardView

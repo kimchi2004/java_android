@@ -1,4 +1,4 @@
-package com.example.javademo;
+package com.example.javademo.authentication.register;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.javademo.R;
+import com.example.javademo.authentication.login.LoginActivity;
 
 public class RegisterActivity extends AppCompatActivity {
 

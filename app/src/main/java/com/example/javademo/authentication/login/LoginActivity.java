@@ -1,4 +1,4 @@
-package com.example.javademo;
+package com.example.javademo.authentication.login;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +13,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.javademo.R;
+import com.example.javademo.authentication.register.RegisterActivity;
+import com.example.javademo.authentication.resetpassword.CheckEmailActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -58,6 +61,10 @@ public class LoginActivity extends AppCompatActivity {
                 String passwordInput = password.getText().toString();
 
                 if (isValidUsername(usernameInput) && isValidPassword(passwordInput)) {
+                    Intent intent = new Intent(LoginActivity.this, testloginwithgg.class);
+                    intent.putExtra("USERNAME_KEY", usernameInput);
+                    startActivity(intent);
+                    finish();
                     Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(LoginActivity.this, "Invalid Username or Password. Please try again!", Toast.LENGTH_SHORT).show();
@@ -120,7 +127,7 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if(task.isSuccessful()){
-                                    Intent intent = new Intent(getApplicationContext(), testlogingg.class);
+                                    Intent intent = new Intent(getApplicationContext(), testloginwithgg.class);
                                     startActivity(intent);
 
                                 }else {
@@ -143,7 +150,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user!= null){
-            Intent intent = new Intent(this, testlogingg.class);
+            Intent intent = new Intent(this, testloginwithgg.class);
             startActivity(intent);
         }
     }
