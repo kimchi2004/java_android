@@ -18,7 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class testloginwithgg extends AppCompatActivity {
+public class LoginDetailActivity extends AppCompatActivity {
     GoogleSignInOptions gso;
     GoogleSignInClient gsc;
     TextView name, email;
@@ -56,11 +56,11 @@ public class testloginwithgg extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 FirebaseAuth.getInstance().signOut();
-                gsc.signOut().addOnCompleteListener(testloginwithgg.this, new OnCompleteListener<Void>() {
+                gsc.signOut().addOnCompleteListener(LoginDetailActivity.this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Intent i = new Intent(testloginwithgg.this, LoginActivity.class);
+                            Intent i = new Intent(LoginDetailActivity.this, LoginActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(i);
                             finish();

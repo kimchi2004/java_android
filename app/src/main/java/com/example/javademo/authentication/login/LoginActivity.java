@@ -1,21 +1,27 @@
 package com.example.javademo.authentication.login;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.javademo.R;
 import com.example.javademo.authentication.register.RegisterActivity;
 import com.example.javademo.authentication.resetpassword.CheckEmailActivity;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -29,6 +35,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.Arrays;
+
 public class LoginActivity extends AppCompatActivity {
 
     ImageView googleBtn;
@@ -39,7 +47,9 @@ public class LoginActivity extends AppCompatActivity {
     Button loginButton;
     Button create_new_accountButton;
     Button forgot_passwordButton;
-
+    ImageView facebookBtn;
+    CallbackManager callbackManager;
+    private static final String EMAIL = "email";
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -53,6 +63,32 @@ public class LoginActivity extends AppCompatActivity {
         create_new_accountButton = findViewById(R.id.createnewaccountButton);
         forgot_passwordButton = findViewById(R.id.forgotpasswordText);
         googleBtn = findViewById(R.id.google_button);
+        facebookBtn = findViewById(R.id.facebook_button);
+        callbackManager = CallbackManager.Factory.create();
+        facebookBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile"));
+            }
+        });
+
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        Log.d("letSee","Facebook Token: " + loginResult.getAccessToken().getToken());
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Log.d("letSee","Facebook onCancel");
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        Log.d("letSee","Facebook onError ");
+                    }
+                });
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
                 String passwordInput = password.getText().toString();
 
                 if (isValidUsername(usernameInput) && isValidPassword(passwordInput)) {
-                    Intent intent = new Intent(LoginActivity.this, testloginwithgg.class);
+                    Intent intent = new Intent(LoginActivity.this, LoginDetailActivity.class);
                     intent.putExtra("USERNAME_KEY", usernameInput);
                     startActivity(intent);
                     finish();
@@ -77,12 +113,12 @@ public class LoginActivity extends AppCompatActivity {
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        gsc = GoogleSignIn.getClient(this,options);
+        gsc = GoogleSignIn.getClient(this, options);
         googleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = gsc.getSignInIntent();
-                startActivityForResult(i,1234);
+                startActivityForResult(i, 1234);
 
             }
         });
@@ -115,22 +151,23 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1234){
+        if (requestCode == 1234) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
 
-                AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(),null);
+                AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
                 FirebaseAuth.getInstance().signInWithCredential(credential)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                if(task.isSuccessful()){
-                                    Intent intent = new Intent(getApplicationContext(), testloginwithgg.class);
+                                if (task.isSuccessful()) {
+                                    Intent intent = new Intent(getApplicationContext(), LoginDetailActivity.class);
                                     startActivity(intent);
 
-                                }else {
+                                } else {
                                     Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 }
 
@@ -149,9 +186,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user!= null){
-            Intent intent = new Intent(this, testloginwithgg.class);
+        if (user != null) {
+            Intent intent = new Intent(this, LoginDetailActivity.class);
             startActivity(intent);
         }
     }
+
 }
