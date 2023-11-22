@@ -7,14 +7,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.javademo.R;
+import com.example.javademo.authentication.login.LoginActivity;
 
 public class CheckEmailActivity extends AppCompatActivity {
 
     EditText email;
     Button sendinstructionsButton;
+    Button backBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +25,7 @@ public class CheckEmailActivity extends AppCompatActivity {
         setContentView(R.layout.checkemail_to_resetpass);
 
         email = findViewById(R.id.email);
+        backBtn = findViewById(R.id.backButton);
         sendinstructionsButton = findViewById(R.id.sendinstructionsButton);
         sendinstructionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -35,14 +39,13 @@ public class CheckEmailActivity extends AppCompatActivity {
                 }
             }
         });
-//        sendinstructionsButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (isCheckEmailValid()){
-//
-//                }
-//            }
-//        });
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CheckEmailActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private boolean isCheckEmailValid() {
