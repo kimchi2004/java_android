@@ -2,6 +2,7 @@ package com.example.javademo.authentication.login;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -38,15 +39,20 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import java.util.Arrays;
 
 public class LoginActivity extends AppCompatActivity {
+    EditText username;
+    EditText password;
+    Button loginButton;
+    SharedPreferences sharedPreferences;
+    private static final String SHARED_PREF_NAME = "mypref";
+    private static final String KEY_NAME = "username";
+    private static final String KEY_PASSWORD = "password";
 
     ImageView googleBtn;
     private GoogleSignInClient gsc;
 
-    EditText username;
-    EditText password;
-    Button loginButton;
     Button create_new_accountButton;
     Button forgot_passwordButton;
+
     ImageView facebookBtn;
     CallbackManager callbackManager;
     private static final String EMAIL = "email";
@@ -60,11 +66,59 @@ public class LoginActivity extends AppCompatActivity {
         username = findViewById(R.id.register_username);
         password = findViewById(R.id.register_password);
         loginButton = findViewById(R.id.loginButton);
+        sharedPreferences = getSharedPreferences(SHARED_PREF_NAME,MODE_PRIVATE);
+
         create_new_accountButton = findViewById(R.id.createnewaccountButton);
         forgot_passwordButton = findViewById(R.id.forgotpasswordText);
+
         googleBtn = findViewById(R.id.google_button);
+
         facebookBtn = findViewById(R.id.facebook_button);
         callbackManager = CallbackManager.Factory.create();
+
+        //login
+        String name = sharedPreferences.getString(KEY_NAME, null);
+        if (name!=null) {
+            Intent intent = new Intent(LoginActivity.this,LoginDetailActivity.class);
+            startActivity(intent);
+        }
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String usernameInput = username.getText().toString();
+                String passwordInput = password.getText().toString();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(KEY_NAME,usernameInput);
+                editor.putString(KEY_PASSWORD,passwordInput);
+                editor.apply();
+                if (isValidUsername(usernameInput) && isValidPassword(passwordInput)) {
+                    Intent intent = new Intent(LoginActivity.this, LoginDetailActivity.class);
+                    intent.putExtra("USERNAME_KEY", usernameInput);
+                    startActivity(intent);
+                    finish();
+                    Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(LoginActivity.this, "Invalid Username or Password. Please try again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        //login with google
+        GoogleSignInOptions options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        gsc = GoogleSignIn.getClient(this, options);
+        googleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = gsc.getSignInIntent();
+                startActivityForResult(i, 1234);
+
+            }
+        });
+
+        //login with facebook
         facebookBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,38 +144,6 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String usernameInput = username.getText().toString();
-                String passwordInput = password.getText().toString();
-
-                if (isValidUsername(usernameInput) && isValidPassword(passwordInput)) {
-                    Intent intent = new Intent(LoginActivity.this, LoginDetailActivity.class);
-                    intent.putExtra("USERNAME_KEY", usernameInput);
-                    startActivity(intent);
-                    finish();
-                    Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(LoginActivity.this, "Invalid Username or Password. Please try again!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-
-        GoogleSignInOptions options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        gsc = GoogleSignIn.getClient(this, options);
-        googleBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = gsc.getSignInIntent();
-                startActivityForResult(i, 1234);
-
-            }
-        });
         create_new_accountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

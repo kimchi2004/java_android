@@ -1,13 +1,14 @@
 package com.example.javademo.authentication.login;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.javademo.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -23,6 +24,11 @@ public class LoginDetailActivity extends AppCompatActivity {
     GoogleSignInClient gsc;
     TextView name, email;
     Button signOutBtn;
+    SharedPreferences sharedPreferences;
+    private static final String SHARED_PREF_NAME = "mypref";
+    private static final String KEY_NAME = "username";
+    private static final String KEY_PASSWORD = "password";
+    private static final String KEY_EMAIL = "email";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +38,13 @@ public class LoginDetailActivity extends AppCompatActivity {
         name = findViewById(R.id.name);
         email = findViewById(R.id.email);
         signOutBtn = findViewById(R.id.signout);
+        sharedPreferences = getSharedPreferences(SHARED_PREF_NAME,MODE_PRIVATE);
+        String _name = sharedPreferences.getString(KEY_NAME,null);
+        String _email = sharedPreferences.getString(KEY_EMAIL,null);
+        if (_name != null || _email != null){
+            name.setText(_name);
+            email.setText(_email);
+        }
 
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
         gsc = GoogleSignIn.getClient(this, gso);
@@ -55,6 +68,9 @@ public class LoginDetailActivity extends AppCompatActivity {
         signOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.commit();
                 FirebaseAuth.getInstance().signOut();
                 gsc.signOut().addOnCompleteListener(LoginDetailActivity.this, new OnCompleteListener<Void>() {
                     @Override
