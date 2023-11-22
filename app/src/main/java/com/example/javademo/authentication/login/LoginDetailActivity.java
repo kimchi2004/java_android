@@ -33,7 +33,7 @@ public class LoginDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.testlogingg);
+        setContentView(R.layout.logindetail);
 
         name = findViewById(R.id.name);
         email = findViewById(R.id.email);
