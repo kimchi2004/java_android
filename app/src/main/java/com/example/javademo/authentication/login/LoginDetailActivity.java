@@ -68,9 +68,11 @@ public class LoginDetailActivity extends AppCompatActivity {
         signOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //login
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.clear();
                 editor.commit();
+                //login with google
                 FirebaseAuth.getInstance().signOut();
                 gsc.signOut().addOnCompleteListener(LoginDetailActivity.this, new OnCompleteListener<Void>() {
                     @Override

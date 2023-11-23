@@ -81,7 +81,10 @@ public class LoginActivity extends AppCompatActivity {
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
-
+        if(accessToken!=null && accessToken.isExpired()== false){
+            startActivity(new Intent(LoginActivity.this,LoginWithFacebook.class));
+            finish();
+        }
 
         //login-----------------------------
         String name = sharedPreferences.getString(KEY_NAME, null);
@@ -154,7 +157,8 @@ public class LoginActivity extends AppCompatActivity {
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-                        Log.d("letSee","Facebook Token: " + loginResult.getAccessToken().getToken());
+                        startActivity(new Intent(LoginActivity.this,LoginWithFacebook.class));
+                        finish();
                     }
 
                     @Override
