@@ -67,17 +67,15 @@
 
                 <Button
                     android:id="@+id/backButton"
-                    android:layout_width="50dp"
-                    android:layout_height="31dp"
-                    android:layout_marginLeft="260dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="220dp"
                     android:backgroundTint="@color/white"
-                    android:drawableRight="@drawable/baseline_keyboard_backspace_24"
                     android:textAlignment="center"
-                    android:textColor="@color/black"
-                    android:textSize="10sp"
-                    android:text="  "
-                    android:outlineSpotShadowColor="@color/transpaper"
-                    android:drawableTint="@color/purple"/>
+                    android:textColor="@color/purple"
+                    android:textSize="12sp"
+                    android:text="Back"
+                    android:outlineSpotShadowColor="@color/transpaper"/>
 
             </LinearLayout>
 
