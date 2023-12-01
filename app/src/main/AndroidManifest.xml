@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".authentication.register.RegisterActivity"
+            android:name=".authentication.register.Dialog_RegisterActivity"
             android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -49,7 +49,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".authentication.login.LoginWithFacebook"
+            android:name=".authentication.login.LoginWithFacebookdetail"
             android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />

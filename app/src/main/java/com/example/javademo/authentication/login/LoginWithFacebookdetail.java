@@ -1,5 +1,6 @@
 package com.example.javademo.authentication.login;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -17,10 +18,11 @@ import com.facebook.login.LoginManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LoginWithFacebook extends AppCompatActivity {
+public class LoginWithFacebookdetail extends AppCompatActivity {
     TextView name, email;
     Button signOutBtn;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +57,7 @@ public class LoginWithFacebook extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 LoginManager.getInstance().logOut();
-                startActivity(new Intent(LoginWithFacebook.this,LoginActivity.class));
+                startActivity(new Intent(LoginWithFacebookdetail.this, LoginActivity.class));
                 finish();
             }
         });

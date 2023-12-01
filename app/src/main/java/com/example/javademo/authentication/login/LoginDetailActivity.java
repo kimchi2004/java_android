@@ -27,7 +27,6 @@ public class LoginDetailActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     private static final String SHARED_PREF_NAME = "mypref";
     private static final String KEY_NAME = "username";
-    private static final String KEY_PASSWORD = "password";
     private static final String KEY_EMAIL = "email";
 
     @Override

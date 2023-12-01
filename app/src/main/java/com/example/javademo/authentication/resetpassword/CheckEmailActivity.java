@@ -25,7 +25,6 @@ public class CheckEmailActivity extends AppCompatActivity {
         setContentView(R.layout.checkemail_to_resetpass);
 
         email = findViewById(R.id.email);
-        backBtn = findViewById(R.id.backButton);
         sendinstructionsButton = findViewById(R.id.sendinstructionsButton);
         sendinstructionsButton.setOnClickListener(new View.OnClickListener() {
             @Override

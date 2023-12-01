@@ -23,12 +23,11 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.forgot_password);
+        setContentView(R.layout.dialog_forgotpassword);
 
         newpassword = findViewById(R.id.newpassword);
         confirm_newpassword = findViewById(R.id.confirmnewpassword);
         resetpasswordButton = findViewById(R.id.resetpasswordButton);
-        loginnowButton = findViewById(R.id.loginnowButton);
         resetpasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
