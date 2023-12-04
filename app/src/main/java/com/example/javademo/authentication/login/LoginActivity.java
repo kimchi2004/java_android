@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,8 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -35,24 +38,51 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 
 public class LoginActivity extends AppCompatActivity {
     private GoogleSignInClient gsc;
+    GoogleSignInOptions gso;
     CallbackManager callbackManager;
     private static final String EMAIL = "email";
+    TextView login_name;
+    String loginname = "";
+    FirebaseAuth mAuth;
+
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
+        login_name = findViewById(R.id.login_name);
+
+        //username
+        mAuth = FirebaseAuth.getInstance();
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
+        loginname = sharedPreferences.getString(KEY_NAME, "");
+        updateLoginName();
+
+        //google
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+        gsc = GoogleSignIn.getClient(this, gso);
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        if (acct != null) {
+            String personName = acct.getDisplayName();
+            login_name.setText(personName);
+        }
+
+        //facebook
+        fetchFacebookUserName();
     }
 
     //onActivityResult------------------
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (requestCode == 1234) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
@@ -64,9 +94,11 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    Intent intent = new Intent(getApplicationContext(), LoginDetailActivity.class);
+//                                    Intent intent = new Intent(getApplicationContext(), LoginDetailActivity.class);
+//                                    startActivity(intent);
+                                    Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
                                     startActivity(intent);
-
+                                    Toast.makeText(LoginActivity.this, acct.getDisplayName(), Toast.LENGTH_SHORT).show();
                                 } else {
                                     Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 }
@@ -82,15 +114,54 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    //onStart--------------
-    protected void onStart() {
-        super.onStart();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            Intent intent = new Intent(this, LoginDetailActivity.class);
-            startActivity(intent);
+    //googleSignOut
+    private void googleSignOut() {
+        gsc.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                // Successfully signed out from Google
+                // You can perform any other operations here
+            }
+        });
+    }
+
+    //facebook
+    private void fetchFacebookUserName() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken != null) {
+            GraphRequest request = GraphRequest.newMeRequest(
+                    accessToken,
+                    new GraphRequest.GraphJSONObjectCallback() {
+                        @Override
+                        public void onCompleted(JSONObject object, GraphResponse response) {
+                            try {
+                                if (object != null && object.has("name")) {
+                                    String fullName = object.getString("name");
+                                    login_name.setText(fullName);
+                                    Toast.makeText(LoginActivity.this,fullName, Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+            Bundle parameters = new Bundle();
+            parameters.putString("fields", "name");
+            request.setParameters(parameters);
+            request.executeAsync();
         }
     }
+
+    //onStart--------------
+//    protected void onStart() {
+//        super.onStart();
+//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//        if (user != null) {
+//            Intent intent = new Intent(this, LoginDetailActivity.class);
+//            startActivity(intent);
+//        }
+//    }
 
     //login---------------------
         SharedPreferences sharedPreferences;
@@ -98,7 +169,26 @@ public class LoginActivity extends AppCompatActivity {
     private static final String KEY_NAME = "username";
     private static final String KEY_PASSWORD = "password";
 
+    //username
+    private void updateLoginName() {
+        login_name.setText(loginname);
+    }
+
+    public void logoutUsername() {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(KEY_NAME);
+        editor.remove(KEY_PASSWORD);
+        editor.apply();
+
+        Toast.makeText(this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+    }
+
     public void dialog_loginShow(View view) {
+        logoutUsername();
+        mAuth.signOut();
+        googleSignOut();
+        LoginManager.getInstance().logOut();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         View dialog_login = inflater.inflate(R.layout.dialog_login,null);
@@ -135,6 +225,9 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                     Toast.makeText(LoginActivity.this, usernameInput, Toast.LENGTH_SHORT).show();
+                    loginname = usernameInput;
+                    dialog.dismiss();
+                    updateLoginName();
                 } else {
                     Toast.makeText(LoginActivity.this, "Invalid Username or Password. Please try again!", Toast.LENGTH_SHORT).show();
                 }
@@ -192,8 +285,7 @@ public class LoginActivity extends AppCompatActivity {
                         Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
                         startActivity(intent);
                         finish();
-                        Toast.makeText(LoginActivity.this,"", Toast.LENGTH_SHORT).show();
-
+                        dialog.dismiss();
                     }
 
                     @Override

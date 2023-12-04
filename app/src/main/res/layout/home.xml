@@ -22,6 +22,14 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/login_name"
+                    android:text="name"
+                    android:textColor="@color/purple"
+                    android:textSize="24sp"/>
+
                 <Button
                     android:id="@+id/dialog_loginButton"
                     android:layout_width="wrap_content"
