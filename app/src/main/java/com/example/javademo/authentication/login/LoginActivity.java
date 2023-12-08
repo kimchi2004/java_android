@@ -325,6 +325,7 @@ public class LoginActivity extends AppCompatActivity {
         builder.setView(dialog_register);
         AlertDialog dialog = builder.create();
         dialog.show();
+        //
 
         final EditText username = (EditText) dialog_register.findViewById(R.id.register_username);
         final EditText password = (EditText) dialog_register.findViewById(R.id.register_password);
