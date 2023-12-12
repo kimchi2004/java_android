@@ -17,8 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.javademo.R;
-import com.example.javademo.authentication.ILoginCallback;
-import com.example.javademo.authentication.UserObject;
 import com.example.javademo.authentication.ValidActivity;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -47,7 +45,7 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
-public class LoginActivity extends AppCompatActivity implements ILoginCallback{
+public class LoginActivity extends AppCompatActivity implements ILoginCallback {
     private GoogleSignInClient gsc;
     GoogleSignInOptions gso;
     CallbackManager callbackManager;
@@ -55,18 +53,17 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback{
     TextView login_name;
     String loginname = "";
 
-    String fullName = "";
     FirebaseAuth mAuth;
 
-    final UserObject userCallback = new UserObject();
 
     //callback
     public void onSuccess(String username) {
-        Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
-        startActivity(intent);
-        finish();
-        login_name.setText(userCallback.getFullName());
-        Toast.makeText(this, "Login Successful! " + userCallback.getFullName(), Toast.LENGTH_SHORT).show();
+        if (username != null && !username.isEmpty()) {
+            Intent intent = new Intent(LoginActivity.this,LoginActivity.class);
+            startActivity(intent);
+            finish();
+            Toast.makeText(LoginActivity.this, "Login Successful! " + username, Toast.LENGTH_SHORT).show();
+        }
     }
     public void onFail(String errorMessage) {
         Toast.makeText(this,errorMessage, Toast.LENGTH_SHORT).show();
@@ -82,7 +79,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback{
         mAuth = FirebaseAuth.getInstance();
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
         loginname = sharedPreferences.getString(KEY_NAME, "");
-//        updateLoginName();
+        updateLoginName();
 
         //google
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
@@ -90,11 +87,15 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback{
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
             String personName = acct.getDisplayName();
-//            login_name.setText(personName);
+            login_name.setText(personName);
         }
 
         //facebook
-        fetchFacebookUserName();
+        fetchFacebookUserName(new userNameCallback() {
+            public void onFullNameReceived(String fullName) {
+                login_name.setText(fullName);
+            }
+        });
     }
 
     //onActivityResult------------------
@@ -140,7 +141,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback{
 
     //facebook
 
-    private void fetchFacebookUserName() {
+    private boolean isNameUpdated = false;
+    private void fetchFacebookUserName(userNameCallback callback) {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken != null) {
             GraphRequest request = GraphRequest.newMeRequest(
@@ -151,9 +153,10 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback{
                             try {
                                 if (object != null && object.has("name")) {
                                     String fullName = object.getString("name");
-                                    userCallback.create(fullName);
-//                                    login_name.setText(fullName);
-                                    onSuccess(fullName);
+                                    if (!isNameUpdated) {
+                                        callback.onFullNameReceived(fullName);
+                                        isNameUpdated = true;
+                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -272,8 +275,11 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback{
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-                        fetchFacebookUserName();
-//                        LoginActivity.this.onSuccess(userCallback.getFullName());
+                        fetchFacebookUserName(new userNameCallback() {
+                            public void onFullNameReceived(String fullName) {
+                                LoginActivity.this.onSuccess(fullName);
+                            }
+                        });
                         dialog.dismiss();
                     }
 
