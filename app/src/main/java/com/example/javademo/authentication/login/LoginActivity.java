@@ -17,7 +17,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.javademo.R;
-import com.example.javademo.ValidActivity;
+import com.example.javademo.authentication.ILoginCallback;
+import com.example.javademo.authentication.UserObject;
+import com.example.javademo.authentication.ValidActivity;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -45,15 +47,32 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements ILoginCallback{
     private GoogleSignInClient gsc;
     GoogleSignInOptions gso;
     CallbackManager callbackManager;
     private static final String EMAIL = "email";
     TextView login_name;
     String loginname = "";
+
+    String fullName = "";
     FirebaseAuth mAuth;
 
+    final UserObject userCallback = new UserObject();
+
+    //callback
+    public void onSuccess(String username) {
+        Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
+        startActivity(intent);
+        finish();
+        login_name.setText(userCallback.getFullName());
+        Toast.makeText(this, "Login Successful! " + userCallback.getFullName(), Toast.LENGTH_SHORT).show();
+    }
+    public void onFail(String errorMessage) {
+        Toast.makeText(this,errorMessage, Toast.LENGTH_SHORT).show();
+    }
+
+    //onCreate
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
@@ -63,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
         loginname = sharedPreferences.getString(KEY_NAME, "");
-        updateLoginName();
+//        updateLoginName();
 
         //google
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
@@ -71,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
             String personName = acct.getDisplayName();
-            login_name.setText(personName);
+//            login_name.setText(personName);
         }
 
         //facebook
@@ -94,13 +113,9 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-//                                    Intent intent = new Intent(getApplicationContext(), LoginDetailActivity.class);
-//                                    startActivity(intent);
-                                    Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
-                                    startActivity(intent);
-                                    Toast.makeText(LoginActivity.this, acct.getDisplayName(), Toast.LENGTH_SHORT).show();
+                                    onSuccess(acct.getDisplayName());
                                 } else {
-                                    Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    onFail(task.getException().getMessage());
                                 }
 
                             }
@@ -119,13 +134,12 @@ public class LoginActivity extends AppCompatActivity {
         gsc.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                // Successfully signed out from Google
-                // You can perform any other operations here
             }
         });
     }
 
     //facebook
+
     private void fetchFacebookUserName() {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken != null) {
@@ -137,8 +151,9 @@ public class LoginActivity extends AppCompatActivity {
                             try {
                                 if (object != null && object.has("name")) {
                                     String fullName = object.getString("name");
-                                    login_name.setText(fullName);
-                                    Toast.makeText(LoginActivity.this,fullName, Toast.LENGTH_SHORT).show();
+                                    userCallback.create(fullName);
+//                                    login_name.setText(fullName);
+                                    onSuccess(fullName);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -153,21 +168,13 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    //onStart--------------
-//    protected void onStart() {
-//        super.onStart();
-//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//        if (user != null) {
-//            Intent intent = new Intent(this, LoginDetailActivity.class);
-//            startActivity(intent);
-//        }
-//    }
 
     //login---------------------
         SharedPreferences sharedPreferences;
     private static final String SHARED_PREF_NAME = "mypref";
     private static final String KEY_NAME = "username";
     private static final String KEY_PASSWORD = "password";
+    private static final String KEY_EMAIL = "email";
 
     //username
     private void updateLoginName() {
@@ -202,10 +209,7 @@ public class LoginActivity extends AppCompatActivity {
         final Button loginButton = (Button) dialog_login.findViewById(R.id.loginButton);
         sharedPreferences = getSharedPreferences(SHARED_PREF_NAME,MODE_PRIVATE);
         String name = sharedPreferences.getString(KEY_NAME, null);
-//        if (name!=null) {
-//            Intent intent = new Intent(LoginActivity.this,LoginDetailActivity.class);
-//            startActivity(intent);
-//        }
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -216,20 +220,12 @@ public class LoginActivity extends AppCompatActivity {
                 editor.putString(KEY_PASSWORD, passwordInput);
                 editor.apply();
                 if (ValidActivity.isValidUsername(usernameInput) && ValidActivity.isValidPassword(passwordInput)) {
-//                    Intent intent = new Intent(LoginActivity.this, LoginDetailActivity.class);
-//                    intent.putExtra("USERNAME_KEY", usernameInput);
-//                    startActivity(intent);
-//                    finish();
-                    Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
-                    Toast.makeText(LoginActivity.this, usernameInput, Toast.LENGTH_SHORT).show();
+                    onSuccess(usernameInput);
                     loginname = usernameInput;
                     dialog.dismiss();
                     updateLoginName();
                 } else {
-                    Toast.makeText(LoginActivity.this, "Invalid Username or Password. Please try again!", Toast.LENGTH_SHORT).show();
+                    onFail(" Invalid Username or Password. Please try again!");
                 }
             }
         });
@@ -248,10 +244,6 @@ public class LoginActivity extends AppCompatActivity {
         facebookBtn.setReadPermissions(Arrays.asList(EMAIL));
         callbackManager = CallbackManager.Factory.create();
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
-//        if(accessToken!=null && accessToken.isExpired()== false){
-//            startActivity(new Intent(LoginActivity.this, LoginWithFacebookdetail.class));
-//            finish();
-//        }
         facebookBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -280,11 +272,8 @@ public class LoginActivity extends AppCompatActivity {
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-//                        startActivity(new Intent(LoginActivity.this, LoginWithFacebookdetail.class));
-//                        finish();
-                        Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
+                        fetchFacebookUserName();
+//                        LoginActivity.this.onSuccess(userCallback.getFullName());
                         dialog.dismiss();
                     }
 
@@ -312,7 +301,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent i = gsc.getSignInIntent();
                 startActivityForResult(i, 1234);
-
+                dialog.dismiss();
             }
         });
     }
@@ -325,12 +314,14 @@ public class LoginActivity extends AppCompatActivity {
         builder.setView(dialog_register);
         AlertDialog dialog = builder.create();
         dialog.show();
-        //
 
         final EditText username = (EditText) dialog_register.findViewById(R.id.register_username);
         final EditText password = (EditText) dialog_register.findViewById(R.id.register_password);
         final EditText email = (EditText) dialog_register.findViewById(R.id.register_email);
         final Button signupButton = (Button) dialog_register.findViewById(R.id.signupButton);
+
+        sharedPreferences = getSharedPreferences(SHARED_PREF_NAME,MODE_PRIVATE);
+        String name = sharedPreferences.getString(KEY_NAME, null);
 
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -338,14 +329,21 @@ public class LoginActivity extends AppCompatActivity {
                 String usernameInput = username.getText().toString();
                 String passwordInput = password.getText().toString();
                 String emailInput = email.getText().toString();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(KEY_NAME, usernameInput);
+                editor.putString(KEY_PASSWORD, passwordInput);
+                editor.putString(KEY_EMAIL, emailInput);
+                editor.apply();
                 if (ValidActivity.isValidUsername(usernameInput) && ValidActivity.isValidPassword(passwordInput) && ValidActivity.isEmailValid(emailInput)) {
-                    Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
-                    Toast.makeText(LoginActivity.this, "Register Successful!", Toast.LENGTH_SHORT).show();
-
+//                    Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
+//                    startActivity(intent);
+//                    finish();
+                    onSuccess(usernameInput);
+                    loginname = usernameInput;
+                    dialog.dismiss();
+                    updateLoginName();
                 } else {
-                    Toast.makeText(LoginActivity.this, "Register failed!", Toast.LENGTH_SHORT).show();
+                    onFail("Register failed!");
                 }
             }
         });
