@@ -52,9 +52,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback {
     private static final String EMAIL = "email";
     TextView login_name;
     String loginname = "";
-
     FirebaseAuth mAuth;
-
 
     //callback
     public void onSuccess(String username) {
@@ -341,9 +339,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback {
                 editor.putString(KEY_EMAIL, emailInput);
                 editor.apply();
                 if (ValidActivity.isValidUsername(usernameInput) && ValidActivity.isValidPassword(passwordInput) && ValidActivity.isEmailValid(emailInput)) {
-//                    Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
-//                    startActivity(intent);
-//                    finish();
                     onSuccess(usernameInput);
                     loginname = usernameInput;
                     dialog.dismiss();
