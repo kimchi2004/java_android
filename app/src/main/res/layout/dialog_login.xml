@@ -52,7 +52,7 @@
         android:textColorHighlight="@color/cardview_dark_background" />
 
     <Button
-        android:id="@+id/forgotpasswordText"
+        android:id="@+id/forgotpasswordButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="80dp"

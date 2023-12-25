@@ -1,4 +1,4 @@
-package com.example.javademo.authentication.login;
+package com.example.javademo.authentication.callback;
 
 public interface ILoginCallback {
     void onSuccess(String username);
