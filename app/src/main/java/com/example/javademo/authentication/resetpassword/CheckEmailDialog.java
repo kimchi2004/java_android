@@ -9,7 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.javademo.R;
-import com.example.javademo.authentication.ValidActivity;
+import com.example.javademo.authentication.valid.ValidActivity;
 import com.example.javademo.authentication.login.LoginActivity;
 
 public class CheckEmailDialog {

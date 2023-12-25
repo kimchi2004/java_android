@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.javademo.R;
-import com.example.javademo.authentication.ValidActivity;
+import com.example.javademo.authentication.valid.ValidActivity;
 import com.example.javademo.authentication.callback.ILoginCallback;
 import com.example.javademo.authentication.login.LoginActivity;
 
@@ -57,6 +57,7 @@ public class SignInDialog {
                 if (ValidActivity.isValidUsername(usernameInput) && ValidActivity.isValidPassword(passwordInput) && ValidActivity.isEmailValid(emailInput)) {
                     callback.onSuccess(usernameInput);
                     dialog.dismiss();
+                    loginActivity.getDialog().dismiss();
                     loginActivity.updateLoginName(name);
                 } else {
                     callback.onFail("Register failed!");

@@ -7,7 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.javademo.authentication.ValidActivity;
+import com.example.javademo.authentication.valid.ValidActivity;
 import com.example.javademo.authentication.callback.ILoginCallback;
 
 public class LoginWithUsername {
@@ -32,8 +32,6 @@ public class LoginWithUsername {
         final EditText password = loginActivity.getPassword();
         final Button loginButton = loginActivity.getLoginButton();
         sharedPreferences = context.getSharedPreferences(SHARED_PREF_NAME, context.MODE_PRIVATE);
-        String name = sharedPreferences.getString(KEY_NAME, null);
-
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,6 +44,7 @@ public class LoginWithUsername {
                 if (ValidActivity.isValidUsername(usernameInput) && ValidActivity.isValidPassword(passwordInput)) {
                     callback.onSuccess(usernameInput);
                     loginActivity.updateLoginName(usernameInput);
+                    loginActivity.getDialog().dismiss();
                 } else {
                     callback.onFail(" Invalid Username or Password. Please try again!");
                 }

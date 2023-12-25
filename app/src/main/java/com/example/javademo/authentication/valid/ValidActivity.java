@@ -1,4 +1,4 @@
-package com.example.javademo.authentication;
+package com.example.javademo.authentication.valid;
 
 import android.util.Patterns;
 

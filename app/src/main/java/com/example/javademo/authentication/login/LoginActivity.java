@@ -133,6 +133,11 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback{
         login_name.setText(loginname);
     }
 
+    AlertDialog _dialog;
+    public AlertDialog getDialog(){
+        return _dialog;
+    }
+
     public void dialog_loginShow(View view) {
         //logout
         loginWithUsername.logoutUsername();
@@ -147,6 +152,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback{
         builder.setView(dialog_login);
         AlertDialog dialog = builder.create();
         dialog.show();
+        _dialog = dialog;
 
         //login with username---------------------
         username = (EditText) dialog_login.findViewById(R.id.username);
