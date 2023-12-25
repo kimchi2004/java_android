@@ -16,7 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.javademo.R;
-import com.example.javademo.authentication.ValidActivity;
 import com.example.javademo.authentication.callback.ILoginCallback;
 import com.example.javademo.authentication.callback.userNameCallback;
 import com.example.javademo.authentication.register.SignInDialog;
@@ -42,6 +41,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback{
     private GoogleSignInClient gsc;
     GoogleSignInOptions gso;
     CallbackManager callbackManager;
+    private static final String SHARED_PREF_NAME = "mypref";
+    private static final String KEY_NAME = "username";
     private static final String EMAIL = "email";
     TextView login_name;
     String loginname = "";
@@ -51,8 +52,23 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback{
     private SignInDialog signInDialog;
     private LoginWithGoogle loginWithGoogle;
     private LoginWithFacebook loginWithFacebook;
-
-//    ILoginCallback callback;
+    private LoginWithUsername loginWithUsername;
+    SignInButton googleBtn;
+    public SignInButton getGoogleButton() {
+        return googleBtn;
+    }
+    EditText username;
+    EditText password;
+    Button loginButton;
+    public EditText getUsername(){
+        return username;
+    }
+    public EditText getPassword(){
+        return password;
+    }
+    public Button getLoginButton(){
+        return loginButton;
+    }
 
     public void onSuccess(String username) {
         if (username != null && !username.isEmpty()) {
@@ -78,6 +94,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback{
         signInDialog = new SignInDialog(this, this);
         loginWithGoogle = new LoginWithGoogle(this,this);
         loginWithFacebook = new LoginWithFacebook(this,this);
+        loginWithUsername = new LoginWithUsername(this,this);
 
         //username
         mAuth = FirebaseAuth.getInstance();
@@ -111,80 +128,31 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback{
         }
     }
 
-    //login---------------------
-    SharedPreferences sharedPreferences;
-    private static final String SHARED_PREF_NAME = "mypref";
-    private static final String KEY_NAME = "username";
-    private static final String KEY_PASSWORD = "password";
-    private static final String KEY_EMAIL = "email";
-
     //username
     public void updateLoginName(String loginname) {
         login_name.setText(loginname);
     }
 
-    public void logoutUsername() {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove(KEY_NAME);
-        editor.remove(KEY_PASSWORD);
-        editor.apply();
-
-        Toast.makeText(this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
-    }
-
-    SignInButton googleBtn;
-    public SignInButton getGoogleButton() {
-        return googleBtn;
-    }
     public void dialog_loginShow(View view) {
-        logoutUsername();
+        //logout
+        loginWithUsername.logoutUsername();
         mAuth.signOut();
         loginWithGoogle.googleSignOut();
         LoginManager.getInstance().logOut();
+
+        //create dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         View dialog_login = inflater.inflate(R.layout.dialog_login, null);
         builder.setView(dialog_login);
         AlertDialog dialog = builder.create();
         dialog.show();
-        googleBtn = dialog_login.findViewById(R.id.google_button);
+
         //login with username---------------------
-        final EditText username = (EditText) dialog_login.findViewById(R.id.username);
-        final EditText password = (EditText) dialog_login.findViewById(R.id.password);
-        final Button loginButton = (Button) dialog_login.findViewById(R.id.loginButton);
-        sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
-        String name = sharedPreferences.getString(KEY_NAME, null);
-
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String usernameInput = username.getText().toString();
-                String passwordInput = password.getText().toString();
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(KEY_NAME, usernameInput);
-                editor.putString(KEY_PASSWORD, passwordInput);
-                editor.apply();
-                if (ValidActivity.isValidUsername(usernameInput) && ValidActivity.isValidPassword(passwordInput)) {
-                    onSuccess(usernameInput);
-                    loginname = usernameInput;
-                    dialog.dismiss();
-                    updateLoginName(loginname);
-                } else {
-                    onFail(" Invalid Username or Password. Please try again!");
-                }
-            }
-        });
-
-        //sign up Button in login dialog-------------
-        final Button signupButton = (Button) dialog_login.findViewById(R.id.dialog_sigupButton);
-        signupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog_signupshow(v);
-                dialog.dismiss();
-            }
-        });
+        username = (EditText) dialog_login.findViewById(R.id.username);
+        password = (EditText) dialog_login.findViewById(R.id.password);
+        loginButton = (Button) dialog_login.findViewById(R.id.loginButton);
+        loginWithUsername.loginWithUsername();
 
         //login with facebook-----------------
         final LoginButton facebookBtn = (LoginButton) dialog_login.findViewById(R.id.facebook_button);
@@ -239,6 +207,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginCallback{
                 });
 
         //login with google
+        googleBtn = dialog_login.findViewById(R.id.google_button);
         loginWithGoogle.loginWithGoogle();
     }
 
