@@ -19,6 +19,7 @@ public class ValidActivity extends AppCompatActivity {
         boolean isValid = !email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches();
         return isValid;
     }
+
     public static boolean isResetPasswordValid(String newpassword, String confirm_newpassword) {
         boolean isPasswordValid = isValidPassword(newpassword);
         return !newpassword.isEmpty() && !confirm_newpassword.isEmpty() && confirm_newpassword.equals(newpassword) && isPasswordValid;

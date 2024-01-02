@@ -7,7 +7,7 @@
     android:background="@color/purple"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".authentication.login.LoginActivity">
+    tools:context=".MainActivity">
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
                     android:textSize="24sp"/>
 
                 <Button
-                    android:id="@+id/dialog_loginButton"
+                    android:id="@+id/showDialogLoginButton"
                     android:layout_width="wrap_content"
                     android:layout_height="60dp"
                     android:backgroundTint="@color/purple"

@@ -3,6 +3,7 @@ package com.example.javademo.model;
 public class UserAccountModel {
     private String username;
     private String email;
+    private String password;
 
     public void setUsername(String username) {
         this.username = username;
@@ -18,5 +19,13 @@ public class UserAccountModel {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

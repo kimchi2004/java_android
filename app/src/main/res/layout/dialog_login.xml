@@ -52,7 +52,7 @@
         android:textColorHighlight="@color/cardview_dark_background" />
 
     <Button
-        android:id="@+id/forgotpasswordButton"
+        android:id="@+id/dialog_forgotpasswordButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="80dp"
@@ -64,7 +64,7 @@
         android:textColor="@color/grey"
         android:textSize="13sp"
         android:textStyle="italic"
-        android:onClick="dialog_forgotpwShow"/>
+        android:onClick="dialog_checkemailShow"/>
 
     <Button
         android:id="@+id/loginButton"
@@ -86,8 +86,7 @@
         android:textAllCaps="false"
         android:textColor="@color/grey"
         android:textSize="13sp"
-        android:textStyle="italic"
-        android:onClick="dialog_signupshow"/>
+        android:textStyle="italic"/>
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/google_button"
