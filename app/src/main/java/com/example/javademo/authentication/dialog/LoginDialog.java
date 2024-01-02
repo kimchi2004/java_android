@@ -17,12 +17,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.javademo.MainActivity;
 import com.example.javademo.R;
 import com.example.javademo.authentication.callback.ILoginCallback;
 import com.example.javademo.authentication.callback.userNameCallback;
 import com.example.javademo.authentication.login.AuthManager;
-import com.example.javademo.MainActivity;
-import com.example.javademo.authentication.valid.ValidActivity;
 import com.example.javademo.model.UserAccountModel;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -88,7 +87,8 @@ public class LoginDialog extends Dialog {
                 userAccountModel = AuthManager.getUserAccountModel();
                 String usernameInput = username.getText().toString();
                 String passwordInput = password.getText().toString();
-                if (ValidActivity.isValidUsername(usernameInput) && ValidActivity.isValidPassword(passwordInput)) {
+                if (usernameInput.equals(userAccountModel.getUsername()) &&
+                        passwordInput.equals(userAccountModel.getPassword())) {
                     userAccountModel.setUsername(usernameInput);
                     userAccountModel.setPassword(passwordInput);
                     AuthManager.getInstance().saveLocal(mContext, userAccountModel);

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.javademo.R;
 import com.example.javademo.authentication.callback.ILoginCallback;
@@ -50,7 +51,8 @@ public class RegisterDialog extends Dialog {
                     userAccountModel.setPassword(passwordInput);
                     userAccountModel.setEmail(emailInput);
                     AuthManager.getInstance().saveLocal(mContext, userAccountModel);
-                    callback.onSuccess(userAccountModel.getUsername());
+//                    callback.onSuccess(userAccountModel.getUsername());
+                    Toast.makeText(mContext, "Register Successful!", Toast.LENGTH_SHORT).show();
                     loginActivity.updateLoginName(userAccountModel.getUsername());
                     dialog.dismiss();
                 } else {
