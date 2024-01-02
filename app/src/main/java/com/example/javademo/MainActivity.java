@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     GoogleSignInOptions gso;
     GoogleSignInClient gsc;
     TextView login_name;
+    Button loginButton;
     FirebaseAuth mAuth;
     private LoginDialog loginDialog;
     private ILoginCallback iLoginCallback;
@@ -36,6 +38,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
         login_name = findViewById(R.id.login_name);
+        loginButton = findViewById(R.id.showDialogLoginButton);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginDialog.logoutUsername();
+                mAuth.signOut();
+                loginDialog.googleSignOut();
+                LoginManager.getInstance().logOut();
+                DangNhapDialog.getInstance().showsignIn(MainActivity.this, iLoginCallback);
+            }
+        });
         Activity mActivity = this;
         iLoginCallback = new ILoginCallback() {
             @Override
@@ -105,13 +118,5 @@ public class MainActivity extends AppCompatActivity {
     }
     public void updateLoginName(String name) {
         login_name.setText(name);
-    }
-    public void dialog_loginShow(View view) {
-        //logout
-        loginDialog.logoutUsername();
-        mAuth.signOut();
-        loginDialog.googleSignOut();
-        LoginManager.getInstance().logOut();
-        DangNhapDialog.getInstance().showsignIn(this, iLoginCallback);
     }
 }
